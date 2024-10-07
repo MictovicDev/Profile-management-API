@@ -38,7 +38,10 @@ class ProfileSchema(Schema):
     gender: str
     profile_picture: str 
    
-    
+
+class DelUserSchema(Schema):
+    success: bool
+    user: ProfileSchema
 
 class ProfileUpdateResSchema(Schema):
     success: bool

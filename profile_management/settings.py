@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,12 +75,16 @@ WSGI_APPLICATION = 'profile_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+DATABASES = {}
+
+DATABASES["default"]= dj_database_url.parse('postgresql://profilemanagement_s4hi_user:RY5gqwMoQawp1HfA9ofgKrypoBwXYr3X@dpg-cs26lpqj1k6c73bn1k9g-a.oregon-postgres.render.com/profilemanagement_s4hi')
 
 
 # Password validation

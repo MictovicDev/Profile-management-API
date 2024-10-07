@@ -71,7 +71,7 @@ def logout_user(request):
 
 
 #update user model
-@router.put("/user/{user_id}", response={200: ProfileSchema, 401: str})
+@router.put("/user/{user_id}", response={200: ProfileSchema, 404: str})
 def update_user(request, user_id: UUID, payload: ProfileUpdateSchema):
     user = get_object_or_404(User, id=user_id)
     for attr, value in payload.dict(exclude_unset=True).items():
@@ -79,5 +79,12 @@ def update_user(request, user_id: UUID, payload: ProfileUpdateSchema):
         setattr(user, attr, value)
     user.save()
     return user
+
+
+@router.delete("/user/{user_id}", response={200: DelUserSchema, 404: str})
+def delete_user(request, user_id: UUID):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    return {"success": True}
 
 
