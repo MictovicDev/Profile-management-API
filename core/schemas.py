@@ -36,7 +36,7 @@ class ProfileSchema(Schema):
     date_of_birth: str
     address: str
     gender: str
-    profile_picture: str 
+    profile_picture: Optional[str] = File(...)
    
 
 class DelUserSchema(Schema):

@@ -33,10 +33,11 @@ def signup(request, payload: SignUpSchema, profile_picture: UploadedFile = File(
 
 
 
-#retrieves a logged in users Profile
+#retrieves the logged in users Profile
 @router.get("/profile", response={200: ProfileSchema, 400: str})
 def get_user(request):
-       user = request.user
+       if request.user.is_authenticated:
+           user = request.user
        return user
 
 #handling authentication
@@ -63,14 +64,14 @@ def login(request, payload: LoginSchema):
     return {"error": "Invalid credentials"}, 401
     
 
-#used to logout a user
+
 @router.post("/logout", response={200: LogOutResponseSchema, 401: str})
 def logout_user(request):
     logout(request)
     return {"success": True, "message": "Logout successful"}
 
 
-#update user model
+
 @router.put("/user/{user_id}", response={200: ProfileSchema, 404: str})
 def update_user(request, user_id: UUID, payload: ProfileUpdateSchema):
     user = get_object_or_404(User, id=user_id)
