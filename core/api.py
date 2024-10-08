@@ -34,11 +34,13 @@ def signup(request, payload: SignUpSchema, profile_picture: UploadedFile = File(
 
 
 #retrieves the logged in users Profile
-@router.get("/profile", response={200: ProfileSchema, 400: str})
+@router.get("/profile", response={200: ProfileSchema, 404: str})
 def get_user(request):
        if request.user.is_authenticated:
            user = request.user
-       return user
+           return user
+       return {"error": "profile not found"}, 404
+       
 
 #handling authentication
 class GlobalAuth(HttpBearer):
@@ -86,6 +88,6 @@ def update_user(request, user_id: UUID, payload: ProfileUpdateSchema):
 def delete_user(request, user_id: UUID):
     user = get_object_or_404(User, id=user_id)
     user.delete()
-    return {"success": True}
+    return {"success": True, "user": DelUserSchema}
 
 
