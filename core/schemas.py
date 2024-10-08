@@ -13,7 +13,7 @@ class SignUpSchema(Schema):
     address: str
     gender: str
     password: str
-    profile_picture: Optional[str] = File(None) 
+    # profile_picture: Optional[str] = File(None) 
 
 
 class LoginSchema(Schema):
