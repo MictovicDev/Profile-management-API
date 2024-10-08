@@ -87,7 +87,7 @@ def update_user(request, user_id: UUID, payload: ProfileUpdateSchema):
     user.save()
     return user
 
-
+print('hello')
 @router.delete("/user/{user_id}", response={200: DelUserSchema, 404: str})
 def delete_user(request, user_id: UUID):
     user = get_object_or_404(User, id=user_id)
