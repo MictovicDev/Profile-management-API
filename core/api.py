@@ -30,6 +30,8 @@ def signup(request, payload: SignUpSchema, profile_picture: UploadedFile = File(
     user_data["password"] = hashed_password
     user = User.objects.create(**user_data)
     user.profile_picture.save(profile_picture.name, profile_picture)
+    user.is_active = True
+    user.save()
     return 201, ProfileSchema.from_orm(user)
 
 
