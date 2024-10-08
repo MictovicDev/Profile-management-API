@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'core',
     'ninja',
     'rest_framework',
+    'rest_framework.authtoken'
    
 ]
 
@@ -76,16 +77,16 @@ WSGI_APPLICATION = 'profile_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-print('hello')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+# print('hello')
 DATABASES = {}
 
-DATABASES["default"]= dj_database_url.parse('postgresql://profilemanagement_s4hi_user:RY5gqwMoQawp1HfA9ofgKrypoBwXYr3X@dpg-cs26lpqj1k6c73bn1k9g-a.oregon-postgres.render.com/profilemanagement_s4hi')
+DATABASES["default"]= dj_database_url.parse(os.getenv("DATABASE"))
 
 
 # Password validation
@@ -147,19 +148,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 
 
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+#     'AUTH_HEADER_TYPES': ('Bearer',),
+# }
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

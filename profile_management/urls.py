@@ -6,7 +6,7 @@ from core.api import router as core_router
 from django.conf import settings
 from django.conf.urls.static import static
 
-api = NinjaAPI()
+api = NinjaAPI(csrf=True)
 
 
 api.add_router("/", core_router)  

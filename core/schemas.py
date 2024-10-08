@@ -21,8 +21,10 @@ class LoginSchema(Schema):
     password: str
 
 class LoginResponseSchema(Schema):
-    refresh: str
-    access: str
+    token: str
+    name: str
+    email: str
+    
 
 class LogOutResponseSchema(Schema):
     success: bool

@@ -12,12 +12,25 @@ from ninja.errors import HttpError
 from django.shortcuts import get_object_or_404
 from uuid import UUID
 from ninja.responses import Response
+from rest_framework.authtoken.models import Token
 
 
 User = get_user_model()
 
 router = Router()
+
+
+class AuthBearer(HttpBearer):
+    def authenticate(self, request, token):
+            try:
+                token_obj = Token.objects.get(key=token)
+                user = token_obj.user
+                return user
+            except Token.DoesNotExist:
+                return None 
   
+
+
 @router.post("/signup", response={201: ProfileSchema, 400: str})
 def signup(request, payload: SignUpSchema, profile_picture: UploadedFile = File(...)):
     print(payload)
@@ -25,61 +38,43 @@ def signup(request, payload: SignUpSchema, profile_picture: UploadedFile = File(
         return 400, "User with this email already exists."
     user_data = payload.dict()
     print(user_data)
-    #used to hash our password to enhance application security
     hashed_password = make_password(user_data.get('password'))
     user_data["password"] = hashed_password
     user = User.objects.create(**user_data)
     user.profile_picture.save(profile_picture.name, profile_picture)
     user.is_active = True
+    Token.objects.get_or_create(user=user)
     user.save()
     return 201, ProfileSchema.from_orm(user)
 
-
-
-#retrieves the logged in users Profile
-@router.get("/profile", response={201: ProfileSchema, 404: str})
-def get_user(request):
-       if request.user.is_authenticated:
-           user = request.user
-           print(user)
-           return 201, ProfileSchema.from_orm(user)
-       return Response({"message": "Profile not found"}, status=404)
-       
-
-#handling authentication
-class GlobalAuth(HttpBearer):
-    def authenticate(self, request, token):
-        jwt_auth = JWTAuthentication()
-        validated_token = jwt_auth.get_validated_token(token)
-        user = jwt_auth.get_user(validated_token)
-        if user is not None:
-            return user
-        raise HttpError(401, "Invalid token")
-    
     
 
 @router.post("/login", response={200: LoginResponseSchema, 401: str})
 def login(request, payload: LoginSchema):
     user = authenticate(request, email=payload.email, password=payload.password)
     if user:
-        refresh = RefreshToken.for_user(user)
+        token, created = Token.objects.get_or_create(user=user)
         return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            'token': str(token),
+            'name': user.name,
+            'email': user.email
         }
     return Response({"message": "Invalid Login Credentials"}, status=404)
+
+
+
+@router.get("/user{user_id}", auth=AuthBearer(), response={201: ProfileSchema, 404: str})
+def get_user(request,  user_id: UUID):
+    user = get_object_or_404(User, id=user_id)
+    return 201, user
+
+
     
-
-
-@router.post("/logout", response={200: LogOutResponseSchema, 401: str})
-def logout_user(request):
-    logout(request)
-    return {"success": True, "message": "Logout successful"}
-
-
-
-@router.put("/user/{user_id}", response={200: ProfileSchema, 404: str})
+@router.put("/user/{user_id}", auth=AuthBearer(), response={200: ProfileSchema, 404: str})
 def update_user(request, user_id: UUID, payload: ProfileUpdateSchema):
+    authenticated_user = request.auth
+    if authenticated_user.id != user_id:
+        return Response({"message": "You Can't Update another persons Profile"}, status=200)
     user = get_object_or_404(User, id=user_id)
     for attr, value in payload.dict(exclude_unset=True).items():
         print(attr, value)
@@ -87,11 +82,20 @@ def update_user(request, user_id: UUID, payload: ProfileUpdateSchema):
     user.save()
     return user
 
-print('hello')
-@router.delete("/user/{user_id}", response={200: DelUserSchema, 404: str})
+
+@router.delete("/user/{user_id}", auth=AuthBearer(), response={200: DelUserSchema, 404: str})
 def delete_user(request, user_id: UUID):
+    authenticated_user = request.auth
+    if authenticated_user.id != user_id:
+        return Response({"message": "You Can't Delete another person's Profile"}, status=200)
     user = get_object_or_404(User, id=user_id)
     user.delete()
     return Response({"message": "Deleted"}, status=200)
 
 
+
+
+@router.post("/logout", response={200: LogOutResponseSchema, 401: str})
+def logout_user(request):
+    logout(request)
+    return {"success": True, "message": "Logout successful"}
