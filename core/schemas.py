@@ -36,12 +36,12 @@ class ProfileSchema(Schema):
     date_of_birth: str
     address: str
     gender: str
-    profile_picture: Optional[str] = File(...)
+    profile_picture: Optional[str] = File(None)
    
 
 class DelUserSchema(Schema):
     success: bool
-    user: ProfileSchema
+    # user: ProfileSchema
 
 class ProfileUpdateResSchema(Schema):
     success: bool
