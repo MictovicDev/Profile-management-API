@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'profile_management.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
+print('hello')
 DATABASES = {}
 
 DATABASES["default"]= dj_database_url.parse('postgresql://profilemanagement_s4hi_user:RY5gqwMoQawp1HfA9ofgKrypoBwXYr3X@dpg-cs26lpqj1k6c73bn1k9g-a.oregon-postgres.render.com/profilemanagement_s4hi')
